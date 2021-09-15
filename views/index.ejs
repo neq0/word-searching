@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Word Searching</title>
+		<link rel="stylesheet" href="/css/normalize.css" />
+		<link rel="stylesheet" href="/css/style.css" />
+	</head>
+
+	<body>
+		<h1>I want to find words that...</h1>
+		<%# sort errors for the form %>
+		<form action="." method="get" novalidate>
+			<ul>
+				<li>
+					<select name="filter" id="filter">
+						<option value="start"
+							<% if(locals.query && query["filter"] === "start") { %>
+								selected
+							<% } %>
+						>
+							start with
+						</option>
+						<option value="end"
+							<% if(locals.query && query["filter"] === "end") { %>
+								selected
+							<% } %>
+						>
+							end with
+						</option>
+					</select>
+					<input type="text" name="with" id="with" pattern="^[A-Za-z]+$" maxlength="30" autocomplete="off"
+						<% if(locals.query) { %>
+							value="<%= String(query["with"]).substring(0, 30) %>"
+						<% } %>
+						<% if(locals.errors) { %>
+							class="error"
+						<% } %>
+					>
+					<p class="error-list">
+					</p>
+				</li>
+				<li>
+					<button type="submit">Search 🔍</button>
+				</li>
+			</ul>
+		</form>
+		<% if(locals.words) { %>
+			<% if(words.length > 0) { %>
+				<h2>Results:</h2>
+				<p class="results">
+					<% words.forEach(word => { %>
+						<%= word %>
+					<% }) %>
+				</p>
+			<% } else { %>
+				<h2>There are no words that match the criteria.</h2>
+			<% } %>
+		<% } %>
+		
+		<script>
+			const form = document.getElementsByTagName("form")[0];
+
+			const filterWith = document.getElementById("with");
+			const filterError = document.querySelector("input#with+.error-list");
+
+			filterWith.addEventListener("input", checkForErrors);
+
+			function checkForErrors(evt) {
+				if(filterWith.validity.valid) {
+					if(filterWith.classList.contains("error"))
+						filterWith.classList.remove("error");
+					filterError.textContent = "";
+				}
+				else {
+					if(!filterWith.classList.contains("error"))
+						filterWith.classList.add("error");
+					if(filterWith.validity.valueMissing)
+						filterError.textContent = "Please enter a filter";
+					else if(filterWith.validity.patternMismatch)
+						filterError.textContent = "Only English letters are allowed";
+					else if(filterWith.validity.tooLong)
+						filterError.textContent = "The filter can have at most 30 letters";
+					else
+						filterError.textContent = filterWith.validationMessage;
+				}
+			}
+
+			form.addEventListener("submit", evt => {
+				if(!filterWith.validity.valid || filterWith.value.length === 0) {
+					evt.preventDefault();
+				}
+			});
+
+			// checkForErrors();
+		</script>
+
+	</body>
+
+</html>
