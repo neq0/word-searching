@@ -4,23 +4,33 @@ const { query, validationResult } = require("express-validator");
 
 const Word = require("../models/Word");
 
+const wordsPerQuery = 36;
+
 router.get("/search",
 	query("filter")
 		.isIn(["start", "end"])
-		.withMessage("Search filter not understood.")
+		.withMessage("Search filter not understood")
 	,
 	query("with")
 		.trim()
 		.notEmpty()
-		.withMessage("Filter string cannot be empty.")
+		.withMessage("Filter string cannot be empty")
 		.bail()
 		.isAlpha("en-US")
-		.withMessage("Only English letters are allowed (no spaces).")
+		.withMessage("Only English letters are allowed (no spaces)")
 		.toLowerCase()
 		.isLength({
 			max: 30,
 		})
-		.withMessage("The filter can have at most 30 letters.")
+		.withMessage("The filter can have at most 30 letters")
+	,
+	query("after")
+		.trim()
+		.optional()
+		.isAlpha("en-US")
+		.withMessage("'After' value is not a word")
+		.bail()
+		.toLowerCase()
 	,
 	(req, res, next) => {
 		const errors = validationResult(req);
@@ -41,16 +51,28 @@ router.get("/search",
 				default:
 					return next(createError(400, "Unknown filter"));
 			}
-			Word.find()
+			
+			let searchAfterThis = req.query["after"] || "";
+			console.log(`searchAfterThis: ${searchAfterThis}`);
+
+			Word.find({ value: { $gt: searchAfterThis } })
+				.sort({ value: 1 })
 				.where("value").regex(pattern)
-				.limit(40)
+				.limit(wordsPerQuery + 1)
 				.exec()
 				.then(docs => docs.map(doc => doc.value))
 				.then(words => {
-					return res.status(200).json(words);
+					let isThereMore = false;
+					if(words.length === wordsPerQuery + 1) {
+						isThereMore = true;
+						words.pop();
+					}
+					return res.status(200).json({
+						words,
+						isThereMore,
+					});
 				})
 				.catch(next);
-			return;
 		}
 	}
 );

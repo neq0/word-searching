@@ -54,6 +54,20 @@ form .error-list {
 	font-size: 1.1em;
 }
 
-button {
-	padding: 4px 8px;
+#load-more {
+	text-decoration: underline;
+	cursor: pointer;
+	color: rgb(93, 43, 126);
+}
+
+/* #load-more:focus, #load-more:hover {
+	color: rgb(30, 30, 212);
+} */
+
+#load-more.loading {
+	text-decoration: none;
+}
+
+#load-more.hidden {
+	display: none;
 }
