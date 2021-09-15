@@ -50,6 +50,10 @@ form .error-list {
 	margin: 0 0 1em;
 }
 
-.results {
+#results {
 	font-size: 1.1em;
+}
+
+button {
+	padding: 4px 8px;
 }

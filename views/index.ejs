@@ -12,7 +12,6 @@
 
 	<body>
 		<h1>I want to find words that...</h1>
-		<%# sort errors for the form %>
 		<form action="." method="get" novalidate>
 			<ul>
 				<li>
@@ -40,64 +39,15 @@
 							class="error"
 						<% } %>
 					>
-					<p class="error-list">
-					</p>
-				</li>
-				<li>
-					<button type="submit">Search 🔍</button>
+					<p class="error-list"></p>
 				</li>
 			</ul>
 		</form>
-		<% if(locals.words) { %>
-			<% if(words.length > 0) { %>
-				<h2>Results:</h2>
-				<p class="results">
-					<% words.forEach(word => { %>
-						<%= word %>
-					<% }) %>
-				</p>
-			<% } else { %>
-				<h2>There are no words that match the criteria.</h2>
-			<% } %>
-		<% } %>
-		
-		<script>
-			const form = document.getElementsByTagName("form")[0];
+		<h2 id="results-title">Results will show below</h2>
+		<p id="results"></p>
+		<button type="button" id="load-more">Load more</button>
 
-			const filterWith = document.getElementById("with");
-			const filterError = document.querySelector("input#with+.error-list");
-
-			filterWith.addEventListener("input", checkForErrors);
-
-			function checkForErrors(evt) {
-				if(filterWith.validity.valid) {
-					if(filterWith.classList.contains("error"))
-						filterWith.classList.remove("error");
-					filterError.textContent = "";
-				}
-				else {
-					if(!filterWith.classList.contains("error"))
-						filterWith.classList.add("error");
-					if(filterWith.validity.valueMissing)
-						filterError.textContent = "Please enter a filter";
-					else if(filterWith.validity.patternMismatch)
-						filterError.textContent = "Only English letters are allowed";
-					else if(filterWith.validity.tooLong)
-						filterError.textContent = "The filter can have at most 30 letters";
-					else
-						filterError.textContent = filterWith.validationMessage;
-				}
-			}
-
-			form.addEventListener("submit", evt => {
-				if(!filterWith.validity.valid || filterWith.value.length === 0) {
-					evt.preventDefault();
-				}
-			});
-
-			// checkForErrors();
-		</script>
-
+		<script src="/js/ajax-search.js"></script>
 	</body>
 
 </html>
