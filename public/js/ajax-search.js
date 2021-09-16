@@ -27,7 +27,7 @@ filterWith.addEventListener("input", evt => {
 		if(filterWith.value.length > 0) // There's a filter to be searched
 			ajaxSearch();
 		else { // There's no error but filter specified
-			resultTitle.textContent = "Results will show below";
+			resultTitle.textContent = "Results will show here";
 			resultContent.textContent = "";
 		}
 	}
@@ -104,19 +104,16 @@ function ajaxSearch(loadingMore = false) {
 		if(words.length !== 0) {
 			resultTitle.textContent = "Results:";
 			if(!loadingMore) {
-				resultContent.textContent = "";
-				words.forEach((word, index) => {
-					if(index > 0)
-						resultContent.textContent += ' ';
-					resultContent.textContent += word;
-				});
+				// Remove all children first
+				while(resultContent.firstChild) {
+					resultContent.removeChild(resultContent.lastChild);
+				}	
 			}
-			else {
-				words.forEach(word => {
-					resultContent.textContent += ' ';
-					resultContent.textContent += word;
-				});
-			}
+			words.forEach(word => {
+				const wordSpan = document.createElement("span");
+				wordSpan.textContent = word;
+				resultContent.append(wordSpan);
+			});
 		}
 		else {
 			resultTitle.textContent = "No words match the criteria";

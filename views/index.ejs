@@ -16,38 +16,21 @@
 			<ul>
 				<li>
 					<select name="filter" id="filter">
-						<option value="start"
-							<% if(locals.query && query["filter"] === "start") { %>
-								selected
-							<% } %>
-						>
-							start with
-						</option>
-						<option value="end"
-							<% if(locals.query && query["filter"] === "end") { %>
-								selected
-							<% } %>
-						>
-							end with
-						</option>
+						<option value="start">start with</option>
+						<option value="end">end with</option>
 					</select>
-					<input type="text" name="with" id="with" pattern="^[A-Za-z]+$" maxlength="30" autocomplete="off"
-						<% if(locals.query) { %>
-							value="<%= String(query["with"]).substring(0, 30) %>"
-						<% } %>
-						<% if(locals.errors) { %>
-							class="error"
-						<% } %>
-					>
+					<input type="text" name="with" id="with" pattern="^[A-Za-z]+$" maxlength="30" autocomplete="off">
 					<p class="error-list"></p>
+				</li>
+				<li>
+					<button type="button" class="and">and</button>
 				</li>
 			</ul>
 		</form>
-		<h2 id="result-title">Results will show below</h2>
+		<hr>
+		<h2 id="result-title">Results will show here</h2>
 		<p id="result-content"></p>
-		<p>
-			<span id="load-more" class="hidden">Load more</span>
-		</p>
+		<button type="button" id="load-more" class="hidden"></button>
 		
 		<script src="/js/ajax-search.js"></script>
 	</body>

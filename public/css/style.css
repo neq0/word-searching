@@ -17,37 +17,62 @@ form {
 form ul {
 	list-style-type: none;
 	padding: 0;
+	margin: 2em 0;
 }
 
-form select, input[type=text] {
+select, input[type=text] {
 	width: 200px;
 	height: 30px;
 	border-radius: 5px;
 	margin: 0 auto 1em;
 }
 
-form select {
+select {
 	display: block;
 	padding-left: 5px;
 }
 
-form input[type=text] {
+input[type=text] {
 	outline: none;
 	padding: 1px 8px;
 }
 
-form button {
+button {
+	border-radius: 5px;
 	padding: 5px 10px;
 }
 
-form :invalid {
+:invalid {
 	border: 2px solid rgb(236, 55, 55);
 }
 
-form .error-list {
+.error-list {
 	font-weight: bold;
+	font-size: 1.1em;
 	color: rgb(236, 55, 55);
 	margin: 0 0 1em;
+}
+
+.error-list:empty {
+	display: none;
+}
+
+.and {
+	opacity: .2;
+}
+
+.and:focus, .and:hover {
+	opacity: 1;
+}
+
+hr {
+	border: unset;
+	border-top: 3px dashed rgb(139, 139, 139);
+}
+
+#result-content {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
 }
 
 #results {
@@ -55,14 +80,15 @@ form .error-list {
 }
 
 #load-more {
-	text-decoration: underline;
+	background-color: rgb(231, 231, 231);
+	/* text-decoration: underline; */
 	cursor: pointer;
-	color: rgb(93, 43, 126);
+	/* color: rgb(93, 43, 126); */
+	/* font-size: 1.2em; */
+	width: 100px;
+	height: 30px;
+	margin: 0 auto;
 }
-
-/* #load-more:focus, #load-more:hover {
-	color: rgb(30, 30, 212);
-} */
 
 #load-more.loading {
 	text-decoration: none;
