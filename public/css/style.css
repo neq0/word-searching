@@ -37,12 +37,17 @@ input[type=text] {
 	padding: 1px 8px;
 }
 
-button {
-	border-radius: 5px;
-	padding: 5px 10px;
+button.and {
+	margin: 0 auto 1em;
 }
 
-:invalid {
+button {
+	border-radius: 5px;
+	padding: 0;
+	/* padding: 5px 10px; */
+}
+
+input[type=text]:invalid {
 	border: 2px solid rgb(236, 55, 55);
 }
 
@@ -58,11 +63,28 @@ button {
 }
 
 .and {
+	width: 72px;
+	height: 36px;
 	opacity: .2;
 }
 
 .and:focus, .and:hover {
 	opacity: 1;
+}
+
+.and:focus span,
+.and:hover span {
+	display: none;
+}
+
+#filter-list li:not(:last-child) .and:focus::before,
+#filter-list li:not(:last-child) .and:hover::before {
+	content: "clear ⬇";
+}
+
+#filter-list li:last-child .and:focus::before,
+#filter-list li:last-child .and:hover::before {
+	content: "➕";
 }
 
 hr {
@@ -96,4 +118,8 @@ hr {
 
 #load-more.hidden {
 	display: none;
+}
+
+form {
+	position: relative;
 }

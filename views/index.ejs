@@ -13,18 +13,7 @@
 	<body>
 		<h1>I want to find words that...</h1>
 		<form action="." method="get" novalidate>
-			<ul>
-				<li>
-					<select name="filter" id="filter">
-						<option value="start">start with</option>
-						<option value="end">end with</option>
-					</select>
-					<input type="text" name="with" id="with" pattern="^[A-Za-z]+$" maxlength="30" autocomplete="off">
-					<p class="error-list"></p>
-				</li>
-				<li>
-					<button type="button" class="and">and</button>
-				</li>
+			<ul id="filter-list">
 			</ul>
 		</form>
 		<hr>

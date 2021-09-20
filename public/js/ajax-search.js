@@ -1,3 +1,14 @@
+const options = [
+	{
+		value: "start",
+		text: "start with",
+	},
+	{
+		value: "end",
+		text: "end with",
+	},
+];
+
 function turnOnClass(elem, className) {
 	if(!elem.classList.contains(className))
 		elem.classList.add(className);
@@ -12,43 +23,131 @@ const form = document.getElementsByTagName("form")[0];
 
 form.addEventListener("submit", evt => evt.preventDefault());
 
-const filter = document.getElementById("filter");
-const filterWith = document.getElementById("with");
-const filterError = document.querySelector("input#with+.error-list");
 const resultTitle = document.getElementById("result-title");
 const resultContent = document.getElementById("result-content");
 const loadMore = document.getElementById("load-more");
 
-filterWith.addEventListener("input", evt => {
-	if(filterWith.validity.valid) {
-		turnOffClass(filterWith, "error");
-		filterError.textContent = "";
+const filterList = document.getElementById("filter-list");
 
-		if(filterWith.value.length > 0) // There's a filter to be searched
-			ajaxSearch();
-		else { // There's no error but filter specified
-			resultTitle.textContent = "Results will show here";
-			resultContent.textContent = "";
+function createFilter() {
+	const filter = document.createElement("select");
+	filter.setAttribute("name", "filter");
+	options.forEach(option => {
+		const optionElem = document.createElement("option");
+		optionElem.setAttribute("value", option.value);
+		optionElem.textContent = option.text;
+		filter.appendChild(optionElem);
+	});
+	filter.addEventListener("input", filtersUpdated);
+
+	const div = document.createElement("div");
+	div.appendChild(filter);
+	return div;
+}
+
+function createFilterWith() {
+	const filterWith = document.createElement("input");
+	filterWith.setAttribute("type", "text");
+	filterWith.setAttribute("name", "with");
+	filterWith.setAttribute("pattern", "^[A-Za-z]+$");
+	filterWith.setAttribute("maxlength", "30");
+	filterWith.setAttribute("autocomplete", "off");
+
+	const errorList = document.createElement("p");
+	errorList.classList.add("error-list");
+
+	filterWith.addEventListener("input", evt => {
+		if(filterWith.validity.valid) {
+			turnOffClass(filterWith, "error");
+			errorList.textContent = "";
+
+			filtersUpdated();
+		}
+		else {
+			turnOnClass(filterWith, "error");
+			if(filterWith.validity.patternMismatch)
+				errorList.textContent = "Only English letters are allowed (no spaces)";
+			else if(filterWith.validity.tooLong)
+				errorList.textContent = "The filter can have at most 30 letters";
+			else
+				errorList.textContent = filterWith.validationMessage;
+		}
+	});
+
+	const div = document.createElement("div");
+	div.appendChild(filterWith);
+	div.appendChild(errorList);
+	return div;
+}
+
+function createAndBtn() {
+	const andBtn = document.createElement("button");
+	andBtn.setAttribute("type", "button");
+	andBtn.classList.add("and");
+	const span = document.createElement("span");
+	span.textContent = "and";
+	andBtn.appendChild(span);
+
+	andBtn.addEventListener("click", evt => {
+		let li = andBtn.parentNode.parentNode;
+		if(li === filterList.lastChild) {
+			// the last `and` button in the list:
+			// create a new filter
+			filterList.appendChild(createFilterTrio());
+		}
+		else {
+			// not the last `and` button in the list:
+			// delete all filters below
+			let nextLi;
+			while(nextLi = li.nextSibling) {
+				nextLi.remove();
+			}
+
+			filtersUpdated();
+		}
+		andBtn.blur();
+	});
+
+	const div = document.createElement("div");
+	div.appendChild(andBtn);
+	return div;
+}
+
+function createFilterTrio() {
+	const li = document.createElement("li");
+	li.appendChild(createFilter());
+	li.appendChild(createFilterWith());
+	li.appendChild(createAndBtn());
+	return li;
+}
+
+function filtersUpdated() {
+	// A search can only be performed if no errors
+	let allWithsValid = true;
+	// A search can only be performed if at least
+	// one `FilterWith` field is non-empty
+	let queryNotEmpty = false;
+	for(const input of document.querySelectorAll("input[type=text]")) {
+		if(!input.validity.valid) {
+			allWithsValid = false;
+			break;
+		}
+		if(input.value.length > 0) {
+			queryNotEmpty = true;
 		}
 	}
-	else {
-		turnOnClass(filterWith, "error");
-		if(filterWith.validity.valueMissing)
-			filterError.textContent = "Please enter a filter";
-		else if(filterWith.validity.patternMismatch)
-			filterError.textContent = "Only English letters are allowed (no spaces)";
-		else if(filterWith.validity.tooLong)
-			filterError.textContent = "The filter can have at most 30 letters";
-		else
-			filterError.textContent = filterWith.validationMessage;
-	}
-});
 
-filter.addEventListener("input", evt => {
-	if(filterWith.value.length > 0) { // There's a filter to be searched
-		ajaxSearch();
+	if(allWithsValid) {
+		if(queryNotEmpty) {
+			ajaxSearch();
+		}
+		else {
+			resultTitle.textContent = "Results will show here";
+			resultContent.textContent = "";
+			turnOnClass(loadMore, "hidden");
+		}
 	}
-});
+}
 
 let loadMoreDisabled = false;
 
@@ -84,7 +183,7 @@ function ajaxSearch(loadingMore = false) {
 			formData.append("after", currentLastWord);
 		
 		let queryUrl = "/ajax/search?" + new URLSearchParams(formData).toString();
-		// console.log("QUERY ->", queryUrl);
+		console.log("QUERY ->", queryUrl);
 		
 		// Record the current AbortController so that
 		// the current fetch can be aborted when a new fetch
@@ -146,3 +245,5 @@ function ajaxSearch(loadingMore = false) {
 		})
 	;
 }
+
+filterList.appendChild(createFilterTrio());

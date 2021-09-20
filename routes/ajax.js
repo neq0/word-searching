@@ -8,29 +8,19 @@ const wordsPerQuery = 36;
 
 router.get("/search",
 	query("filter")
-		.isIn(["start", "end"])
-		.withMessage("Search filter not understood")
+		.toArray()
 	,
 	query("with")
-		.trim()
-		.notEmpty()
-		.withMessage("Filter string cannot be empty")
-		.bail()
-		.isAlpha("en-US")
-		.withMessage("Only English letters are allowed (no spaces)")
-		.toLowerCase()
-		.isLength({
-			max: 30,
-		})
-		.withMessage("The filter can have at most 30 letters")
+		.toArray()
+		.customSanitizer(arr =>
+			arr.map(str =>
+				str.toLowerCase()
+			)
+		)
 	,
 	query("after")
 		.trim()
 		.optional()
-		.isAlpha("en-US")
-		.withMessage("'After' value is not a word")
-		.bail()
-		.toLowerCase()
 	,
 	(req, res, next) => {
 		const errors = validationResult(req);
@@ -38,42 +28,69 @@ router.get("/search",
 			return res.status(400).json(errors.array());
 		}
 
-		let filter = req.query["filter"];
-		if(filter) {
+		let filters = req.query["filter"];
+		let filterWiths = req.query["with"];
+		let patterns = [];
+
+		filters.forEach((filter, index) => {
+			if(filterWiths[index] === "") {
+				return;
+			}
+			
 			let pattern;
 			switch(filter) {
 				case "start":
-					pattern = "^" + req.query["with"];
+					pattern = "^" + filterWiths[index];
 					break;
 				case "end":
-					pattern = req.query["with"] + "$";
+					pattern = filterWiths[index] + "$";
 					break;
 				default:
-					return next(createError(400, "Unknown filter"));
+					// Log and ignore invalid filters
+					console.log("Received invalid filter:", filter);
+					return;
 			}
-			
-			let searchAfterThis = req.query["after"] || "";
-			console.log(`searchAfterThis: ${searchAfterThis}`);
+			patterns.push(pattern);
+		});
 
-			Word.find({ value: { $gt: searchAfterThis } })
-				.sort({ value: 1 })
-				.where("value").regex(pattern)
-				.limit(wordsPerQuery + 1)
-				.exec()
-				.then(docs => docs.map(doc => doc.value))
-				.then(words => {
-					let isThereMore = false;
-					if(words.length === wordsPerQuery + 1) {
-						isThereMore = true;
-						words.pop();
-					}
-					return res.status(200).json({
-						words,
-						isThereMore,
-					});
-				})
-				.catch(next);
+		let queryObj = {
+			$and: [],
+		};
+
+		if(req.query["after"]) {
+			queryObj.$and.push({
+				value: {
+					$gt: req.query["after"],
+				},
+			});
 		}
+
+		patterns.forEach(pattern => {
+			queryObj.$and.push({
+				value: {
+					$regex: pattern,
+				},
+			});
+		});
+
+		Word.find(queryObj)
+			.sort({ value: 1 })
+			.limit(wordsPerQuery + 1)
+			.exec()
+			.then(docs => docs.map(doc => doc.value))
+			.then(words => {
+				let isThereMore = false;
+				if(words.length === wordsPerQuery + 1) {
+					isThereMore = true;
+					words.pop();
+				}
+				return res.status(200).json({
+					words,
+					isThereMore,
+				});
+			})
+			.catch(next)
+		;
 	}
 );
 
