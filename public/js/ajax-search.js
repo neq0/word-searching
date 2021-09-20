@@ -1,5 +1,9 @@
 const options = [
 	{
+		value: "inc",
+		text: "contain the string",
+	},
+	{
 		value: "start",
 		text: "start with",
 	},
@@ -120,7 +124,7 @@ clear.addEventListener("click", evt => {
 		const last = filterList.lastChild;
 		filterList.removeChild(last);
 	}
-	
+
 	let input = filterList.querySelector("input");
 	input.value = "";
 	input.dispatchEvent(new Event("input"));
@@ -220,7 +224,7 @@ function ajaxSearch(loadingMore = false) {
 			});
 		}
 		else {
-			resultTitle.textContent = "No words match the criteria";
+			resultTitle.textContent = "No results";
 			resultContent.textContent = "";
 		}
 

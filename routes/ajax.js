@@ -45,6 +45,9 @@ router.get("/search",
 				case "end":
 					pattern = filterWiths[index] + "$";
 					break;
+				case "inc":
+					pattern = filterWiths[index];
+					break;
 				default:
 					// Log and ignore invalid filters
 					console.log("Received invalid filter:", filter);
