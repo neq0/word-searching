@@ -11,13 +11,17 @@ body {
 }
 
 form {
-	margin: 0 auto;
+	margin: 2em auto;
 }
 
 form ul {
 	list-style-type: none;
 	padding: 0;
-	margin: 2em 0;
+	margin: 0;
+}
+
+form ul li {
+	position: relative;
 }
 
 select, input[type=text] {
@@ -63,21 +67,23 @@ input[type=text]:invalid {
 }
 
 .and {
-	width: 72px;
+	width: 64px;
 	height: 36px;
-	opacity: .2;
 }
 
-.and:focus, .and:hover {
-	opacity: 1;
+#clear {
+	background-color: rgb(94, 138, 221);
+	color: white;
+	width: 85px;
+	height: 36px;
 }
 
-.and:focus span,
+/* .and:focus span,
 .and:hover span {
 	display: none;
-}
+} */
 
-#filter-list li:not(:last-child) .and:focus::before,
+/* #filter-list li:not(:last-child) .and:focus::before,
 #filter-list li:not(:last-child) .and:hover::before {
 	content: "clear ⬇";
 }
@@ -85,7 +91,7 @@ input[type=text]:invalid {
 #filter-list li:last-child .and:focus::before,
 #filter-list li:last-child .and:hover::before {
 	content: "➕";
-}
+} */
 
 hr {
 	border: unset;
@@ -118,8 +124,4 @@ hr {
 
 #load-more.hidden {
 	display: none;
-}
-
-form {
-	position: relative;
 }

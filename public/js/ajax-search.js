@@ -95,16 +95,8 @@ function createAndBtn() {
 			// create a new filter
 			filterList.appendChild(createFilterTrio());
 		}
-		else {
-			// not the last `and` button in the list:
-			// delete all filters below
-			let nextLi;
-			while(nextLi = li.nextSibling) {
-				nextLi.remove();
-			}
-
-			filtersUpdated();
-		}
+		// if not the last `and` button in the list,
+		// do nothing.
 		andBtn.blur();
 	});
 
@@ -120,6 +112,19 @@ function createFilterTrio() {
 	li.appendChild(createAndBtn());
 	return li;
 }
+
+const clear = document.getElementById("clear");
+
+clear.addEventListener("click", evt => {
+	while(filterList.childElementCount > 1) {
+		const last = filterList.lastChild;
+		filterList.removeChild(last);
+	}
+	
+	let input = filterList.querySelector("input");
+	input.value = "";
+	input.dispatchEvent(new Event("input"));
+});
 
 function filtersUpdated() {
 	// A search can only be performed if no errors
